@@ -4,3 +4,4 @@ backend/venv
 *.log
 .env
 .env.local
+~$*

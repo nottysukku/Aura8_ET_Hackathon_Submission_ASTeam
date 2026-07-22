@@ -6,7 +6,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const query = body.query || 'Explain equipment specs';
-    const apiKey = body.apiKey || process.env.GEMINI_API_KEY || '';
+    // Strictly read from server environment variable (.env.local)
+    const apiKey = process.env.GEMINI_API_KEY || '';
 
     const headers = {
       'Content-Type': 'application/json',
