@@ -1,66 +1,102 @@
 # AURA-8: Unified Asset & Operations Brain
 > **ET AI Hackathon 2.0 (2026) Submission** | **Problem Statement 8: AI for Industrial Knowledge Intelligence**
 
-AURA-8 is a production-grade, AI-powered Industrial Knowledge Intelligence platform designed to solve information fragmentation and the operator knowledge cliff in heavy industry.
+AURA-8 is an AI-powered Industrial Knowledge Intelligence platform unifying P&ID engineering drawings, OEM manuals, maintenance logs, and statutory OISD/Factory Act regulations into a queryable visual Knowledge Graph and grounded Gemini RAG Copilot.
 
 ---
 
-## 🌟 Key Features
+## 🚀 How to Initialize the Project from Scratch
 
-1. **Universal Industrial Document Ingestion**:
-   - Ingests P&ID engineering drawings, OEM manuals, maintenance work orders, and statutory OISD/Factory Act regulations.
-   - Decompresses PDF binary streams using `pdf-parse` to extract clean human-readable text page-by-page.
+### Prerequisites
+- **Node.js**: v18+ or v20+
+- **Python**: v3.11+
+- **Git**: Installed
 
-2. **Gateway Landing Page & Zero-Data Mode**:
-   - **Start Clean Workspace**: Zero pre-loaded clutter. Infographics and Knowledge Graphs populate **only after** a file is submitted.
-   - **Guest Demo Mode**: Instant access pre-loaded with sample refinery hydrocracker data (`P-101A` pump, `V-301` column, OISD-137 compliance) for hackathon evaluators.
-
-3. **Dynamic 2D Visual Knowledge Graph**:
-   - Extracts equipment tags (e.g. `P-101A`, `V-301`) and regulatory rules into an interactive visual 2D HTML5 canvas network.
-
-4. **Persistent Google Gemini RAG Copilot**:
-   - Floating assistant drawer accessible across all pages/tabs.
-   - Answers operational queries using `gemini-flash-latest` with exact page-level text citations.
-
-5. **Statutory Compliance & Audit Evidence Package**:
-   - Audits plant operations against OISD-137, Factory Act 1948 Section 37, and PESO rules.
-   - 1-Click export of downloadable statutory audit evidence files.
-
----
-
-## 🛠️ Architecture & Tech Stack
-
-```
-[ User PDF Upload ] ──► [ Next.js / pdf-parse ] ──► [ Vector Similarity Store ]
-                                                             │
-                                                             ▼
-[ Persistent Chatbot ] ◄── [ Google Gemini API ] ◄── [ Top 3 Text Chunks ]
-```
-
-- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS, Lucide Icons, HTML5 Canvas.
-- **Backend API**: Next.js Native App API Routes (`/api/upload`, `/api/query`) + Python 3.11 FastAPI server.
-- **LLM Engine**: Google Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`).
-- **PDF Extraction**: `pdf-parse` (Node.js) & `pypdf` (Python).
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone & Install Dependencies
+### Step 1: Clone Repository
 ```bash
 git clone https://github.com/nottysukku/Aura8_ET_Hackathon_Submission_ASTeam.git
 cd Aura8_ET_Hackathon_Submission_ASTeam
+```
+
+### Step 2: Install Node.js Dependencies
+```bash
 npm install
 ```
 
-### 2. Run Development Server
+### Step 3: Set Up Python RAG Backend Environment
 ```bash
-npm run dev
+# Create Python virtual environment
+python -m venv backend/venv
+
+# Activate virtual environment (Windows PowerShell)
+backend\venv\Scripts\Activate.ps1
+
+# Install Python requirements
+pip install fastapi uvicorn pypdf python-multipart requests python-pptx reportlab
 ```
-Open `http://localhost:3000` in your browser.
+
+### Step 4: Configure Environment Variables (Optional)
+Create a `.env` file in the project root:
+```env
+GEMINI_API_KEY=your_google_gemini_api_key_here
+```
+*(Note: You can also enter your Gemini API Key directly inside the app's top header modal)*
 
 ---
 
-## 📁 Submission Deliverables
-- **Architecture Diagram PDF**: [AURA8_Architecture_Diagram.pdf](AURA8_Architecture_Diagram.pdf)
-- **Pitch Presentation Deck**: [AURA8_Presentation_Deck.pptx](AURA8_Presentation_Deck.pptx)
+## ⚡ How to Run the Application
+
+### Option A: Next.js Full-Stack App (Recommended)
+Start the Next.js development server (handles both UI and native `/api/upload` / `/api/query` RAG endpoints):
+```bash
+npm run dev
+```
+Open **`http://localhost:3000`** (or `http://localhost:3001`) in your browser.
+
+### Option B: Run Python FastAPI RAG Server (Optional Secondary Engine)
+In a separate terminal window:
+```bash
+backend\venv\Scripts\python -m uvicorn backend.main:app --reload --port 8000
+```
+API docs available at **`http://127.0.0.1:8000/docs`**.
+
+---
+
+## 🔄 How to Update the Project & Push to GitHub
+
+### Pulling Latest Updates
+```bash
+git pull origin main
+npm install
+```
+
+### Making Changes & Pushing Updates
+```bash
+# Check status of modified files
+git status
+
+# Stage all updated files
+git add .
+
+# Commit changes
+git commit -m "Update: Describe your feature or fix here"
+
+# Push updates to main branch
+git push origin main
+```
+
+---
+
+## 🌟 Key Application Features
+
+- **Gateway Landing Page**: Choose between **"Start Clean Workspace"** (0 data until PDF uploaded) or **"Login as Guest (Demo Mode)"** (sample hydrocracker data for instant jury review).
+- **Universal Document Ingestion**: Parses PDF text streams page-by-page using `pdf-parse`, chunking text vectors and extracting equipment tags (`P-101A`, `V-301`).
+- **Dynamic 2D Knowledge Graph**: Renders extracted equipment and statutory directives in an interactive visual HTML5 canvas network.
+- **Persistent AI Chatbot**: Floating assistant on all pages powered by Google Gemini (`gemini-flash-latest`).
+- **Statutory Audit Evidence Package**: 1-Click export of downloadable compliance packages for OISD-137 and Factory Act Section 37.
+
+---
+
+## 📁 Included Submissions & Deliverables
+- 📐 **Architecture Diagram PDF**: [AURA8_Architecture_Diagram.pdf](AURA8_Architecture_Diagram.pdf)
+- 📊 **Pitch Presentation Deck**: [AURA8_Presentation_Deck.pptx](AURA8_Presentation_Deck.pptx)
