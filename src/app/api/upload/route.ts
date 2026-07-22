@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     if (filename.toLowerCase().endsWith('.pdf')) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line
         const pdfParse = require('pdf-parse');
         const pdfData = await pdfParse(buffer);
         extractedText = pdfData.text || '';
