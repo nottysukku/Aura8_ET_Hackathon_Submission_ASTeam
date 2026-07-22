@@ -15,7 +15,9 @@ import { ComplianceStudio } from '@/components/Compliance/ComplianceStudio';
 import {
   EquipmentNode,
   IngestedDocument,
-  COMPLIANCE_RULES
+  COMPLIANCE_RULES,
+  INITIAL_KNOWLEDGE_NODES,
+  MOCK_INGESTED_DOCUMENTS
 } from '@/data/mockKnowledgeBase';
 
 export default function Home() {
@@ -56,12 +58,24 @@ export default function Home() {
     }
   };
 
-  const handleSelectMode = (mode: 'clean' | 'demo') => {
+  const handleSelectMode = (mode: 'clean' | 'demo' | 'gateway') => {
+    if (mode === 'gateway') {
+      setSelectedMode(null);
+      setNodes([]);
+      setDocuments([]);
+      return;
+    }
+
     setSelectedMode(mode);
-    fetchFastAPIData();
+
     if (mode === 'clean') {
+      setNodes([]);
+      setDocuments([]);
       setActiveTab('ingestion');
     } else {
+      setNodes(INITIAL_KNOWLEDGE_NODES);
+      setDocuments(MOCK_INGESTED_DOCUMENTS);
+      fetchFastAPIData();
       setActiveTab('dashboard');
     }
   };
@@ -84,9 +98,9 @@ export default function Home() {
     setActiveTab('copilot');
   };
 
-  // If mode not selected yet, show Gateway Landing Page
+  // Render Gateway Landing Page if mode is not selected
   if (!selectedMode) {
-    return <GatewayLanding onSelectMode={handleSelectMode} />;
+    return <GatewayLanding onSelectMode={(m) => handleSelectMode(m)} />;
   }
 
   return (
@@ -106,8 +120,8 @@ export default function Home() {
           activeUnit={activeUnit}
           setActiveUnit={setActiveUnit}
           warningCount={warningCount}
-          apiKey={apiKey}
-          setApiKey={setApiKey}
+          selectedMode={selectedMode}
+          onSwitchMode={handleSelectMode}
         />
 
         <main className="flex-1 overflow-y-auto bg-slate-950/40">
