@@ -17,7 +17,7 @@ import {
 
 interface RAGCopilotProps {
   initialSearchQuery?: string;
-  apiKey: string;
+  apiKey?: string;
   onNavigateToGraphNode?: (nodeTag: string) => void;
 }
 
@@ -50,6 +50,7 @@ export const RAGCopilot: React.FC<RAGCopilotProps> = ({
     if (initialSearchQuery) {
       handleSendQuery(initialSearchQuery);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSearchQuery]);
 
   const handleSendQuery = async (queryText: string) => {

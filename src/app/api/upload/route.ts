@@ -18,13 +18,13 @@ export async function POST(request: Request) {
 
     if (filename.toLowerCase().endsWith('.pdf')) {
       try {
-        const pdfParseModule: any = await import('pdf-parse');
-        const pdfParser = pdfParseModule.default || pdfParseModule;
-        const pdfData = await pdfParser(buffer);
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const pdfParse = require('pdf-parse');
+        const pdfData = await pdfParse(buffer);
         extractedText = pdfData.text || '';
         pageCount = pdfData.numpages || 1;
       } catch (e: any) {
-        console.log('pdf-parse fallback:', e);
+        console.log('pdf-parse extraction notice:', e);
         extractedText = buffer.toString('utf-8', 0, 10000).replace(/[^\x20-\x7E\n\r\t]/g, ' ');
       }
     } else {
