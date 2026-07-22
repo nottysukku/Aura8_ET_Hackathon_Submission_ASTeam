@@ -37,27 +37,6 @@ export default function Home() {
     }
   }, []);
 
-  const fetchFastAPIData = async () => {
-    try {
-      const [srcRes, graphRes] = await Promise.all([
-        fetch('http://127.0.0.1:8000/api/sources'),
-        fetch('http://127.0.0.1:8000/api/graph')
-      ]);
-
-      if (srcRes.ok) {
-        const srcData = await srcRes.json();
-        setDocuments(srcData.sources || []);
-      }
-
-      if (graphRes.ok) {
-        const graphData = await graphRes.json();
-        setNodes(graphData.nodes || []);
-      }
-    } catch (e) {
-      console.log('FastAPI connection check:', e);
-    }
-  };
-
   const handleSelectMode = (mode: 'clean' | 'demo' | 'gateway') => {
     if (mode === 'gateway') {
       setSelectedMode(null);
@@ -75,7 +54,6 @@ export default function Home() {
     } else {
       setNodes(INITIAL_KNOWLEDGE_NODES);
       setDocuments(MOCK_INGESTED_DOCUMENTS);
-      fetchFastAPIData();
       setActiveTab('dashboard');
     }
   };
@@ -87,9 +65,11 @@ export default function Home() {
     setActiveTab('copilot');
   };
 
-  const handleDocumentAdded = (newDoc: IngestedDocument) => {
+  const handleDocumentAdded = (newDoc: IngestedDocument, newNodes?: EquipmentNode[]) => {
     setDocuments((prev) => [newDoc, ...prev]);
-    fetchFastAPIData();
+    if (newNodes && newNodes.length > 0) {
+      setNodes((prev) => [...newNodes, ...prev]);
+    }
     setActiveTab('graph');
   };
 

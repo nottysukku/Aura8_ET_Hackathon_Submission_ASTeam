@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { IngestedDocument } from '@/data/mockKnowledgeBase';
+import { IngestedDocument, EquipmentNode } from '@/data/mockKnowledgeBase';
 import {
   Upload,
   FileCheck,
@@ -16,7 +16,7 @@ import {
 
 interface DocumentIngesterProps {
   documents: IngestedDocument[];
-  onDocumentAdded: (newDoc: IngestedDocument) => void;
+  onDocumentAdded: (newDoc: IngestedDocument, newNodes?: EquipmentNode[]) => void;
 }
 
 export const DocumentIngester: React.FC<DocumentIngesterProps> = ({
@@ -42,26 +42,28 @@ export const DocumentIngester: React.FC<DocumentIngesterProps> = ({
       if (res.ok) {
         const data = await res.json();
         const doc = data.document;
+        const extractedNodes: EquipmentNode[] = data.nodes || [];
 
         const newDocObj: IngestedDocument = {
-          id: doc.id,
-          title: doc.title,
+          id: doc.id || `doc-${Date.now()}`,
+          title: doc.title || file.name,
           type: file.name.endsWith('.pdf') ? 'P&ID Drawing' : 'Inspection Log',
-          filename: doc.filename,
-          uploadedAt: doc.uploadedAt,
-          extractedEntitiesCount: doc.extractedEntitiesCount || 6,
+          filename: doc.filename || file.name,
+          uploadedAt: doc.uploadedAt || 'Just Now',
+          extractedEntitiesCount: doc.extractedEntitiesCount || extractedNodes.length || 6,
           status: 'Processed',
-          fileSize: doc.fileSize,
-          summary: `Extracted text stream from ${doc.filename}. Index created and Knowledge Graph populated dynamically.`,
+          fileSize: doc.fileSize || `${(file.size / 1024).toFixed(1)} KB`,
+          summary: doc.summary || `Extracted text stream from ${file.name}. Index created and Knowledge Graph populated dynamically.`,
           rawSnippet: doc.rawText || 'Raw text snippet extracted from document.',
           keyEntities: [
-            { type: 'File', value: doc.filename, confidence: 1.0 },
-            { type: 'Vector Chunks', value: `${doc.chunksCount} chunks`, confidence: 0.98 }
+            { type: 'File', value: file.name, confidence: 1.0 },
+            { type: 'Extracted Nodes', value: `${extractedNodes.length} nodes`, confidence: 0.98 }
           ]
         };
 
-        onDocumentAdded(newDocObj);
+        onDocumentAdded(newDocObj, extractedNodes);
         setSelectedDoc(newDocObj);
+        setIsUploading(false);
         return;
       }
     } catch (err) {
@@ -83,7 +85,7 @@ export const DocumentIngester: React.FC<DocumentIngesterProps> = ({
         status: 'Processed',
         fileSize: `${(file.size / 1024).toFixed(1)} KB`,
         summary: `Parsed ${file.name} (${(file.size / 1024).toFixed(1)} KB). Document indexed for Gemini RAG query.`,
-        rawSnippet: cleanSnippet || `Extracted binary PDF text stream for ${file.name}.`,
+        rawSnippet: cleanSnippet || `Extracted text stream for ${file.name}.`,
         keyEntities: [
           { type: 'Document Name', value: file.name, confidence: 0.99 },
           { type: 'Size', value: `${(file.size / 1024).toFixed(1)} KB`, confidence: 0.95 }
@@ -171,13 +173,13 @@ export const DocumentIngester: React.FC<DocumentIngesterProps> = ({
       </div>
 
       {/* Document Library & Selected Inspector Grid */}
-      {documents.length > 0 && (
+      {documents.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
           {/* Document List */}
           <div className="lg:col-span-2 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-1">
               <span>INDEXED SOURCES ({documents.length})</span>
-              <span>Gemini RAG Vector Store Active</span>
+              <span className="text-emerald-400 font-bold">Gemini RAG Vector Store Active</span>
             </div>
 
             <div className="space-y-3">
@@ -251,10 +253,14 @@ export const DocumentIngester: React.FC<DocumentIngesterProps> = ({
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-slate-500 text-xs text-center p-4">
                 <FileText className="w-8 h-8 mb-2 text-slate-600" />
-                <span>Upload or select a PDF to inspect raw extracted text & vector chunks.</span>
+                <span>Select an uploaded document to inspect raw text & vector chunks.</span>
               </div>
             )}
           </div>
+        </div>
+      ) : (
+        <div className="p-8 text-center text-slate-500 text-xs font-mono bg-slate-900/40 rounded-2xl border border-slate-800">
+          No files uploaded yet. Drag & drop a PDF file above to index sources & populate the Knowledge Graph.
         </div>
       )}
     </div>
